@@ -26,6 +26,9 @@ set history=1000
 filetype plugin on
 filetype indent on
 
+" Disable vi nocompatible
+set nocompatible        
+
 " Set to auto read when a file is changed from the outside
 set autoread
 
@@ -39,8 +42,8 @@ nmap <leader>w :w!<cr>
 
 " Fast edit _vimrc and auto reload new vimrc after saved
 if g:iswindows
-	map <silent> <leader>ee :e $VIMRUNTIME/../_vimrc<cr>
-	autocmd! bufwritepost _vimrc source $VIMRUNTIME/../_vimrc
+	map <silent> <leader>ee :e $VIM/_vimrc<cr>
+	autocmd! bufwritepost _vimrc source $VIM/_vimrc
 else
 	map <silent> <leader>ee :e $HOME/.vimrc<cr>
 	autocmd! bufwritepost *.vimrc source $HOME/.vimrc
@@ -93,10 +96,62 @@ set t_vb=
 set tm=500
 
 " Add a bit extra margin to left
-set foldcolumn=1
-" -----------------------------------------------------------------------------
-"  < Windows Gvim 默认配置> 做了一点修改
-" -----------------------------------------------------------------------------
+set foldcolumn=2
+
+" Show and hide menu/tool/scrool, switch for Ctrl + F11
+if g:isGUI
+    set guioptions-=m
+    set guioptions-=T
+    set guioptions-=r
+    set guioptions-=L
+    map <silent> <c-F11> :if &guioptions =~# 'm' <Bar>
+        \set guioptions-=m <Bar>
+        \set guioptions-=T <Bar>
+        \set guioptions-=r <Bar>
+        \set guioptions-=L <Bar>
+    \else <Bar>
+        \set guioptions+=m <Bar>
+        \set guioptions+=T <Bar>
+        \set guioptions+=r <Bar>
+        \set guioptions+=L <Bar>
+    \endif<CR>
+endif
+
+" Show line number
+set number                                            
+
+" Set status line
+set laststatus=2
+
+" Show current line
+set cursorline    
+
+set nowrap                                            "设置不自动换行
+set shortmess=atI                                     "去掉欢迎界面
+" au GUIEnter * simalt ~x                              "窗口启动时自动最大化
+winpos 500 10                                         "指定窗口出现的位置，坐标原点在屏幕左上角
+set lines=38 columns=120                              "指定窗口大小，lines为高度，columns为宽度
+
+" status line scheme
+let &statusline=' %t %{&mod?(&ro?"*":"+"):(&ro?"=":" ")} %1*|%* %{&ft==""?"any":&ft} %1*|%* %{&ff} %1*|%* %{(&fenc=="")?&enc:&fenc}%{(&bomb?",BOM":"")} %1*|%* %=%1*|%* 0x%B %1*|%* (%l,%c%V) %1*|%* %L %1*|%* %P'
+"set statusline=%t\ %1*%m%*\ %1*%r%*\ %2*%h%*%w%=%l%3*/%L(%p%%)%*,%c%V]\ [%b:0x%B]\ [%{&ft==''?'TEXT':toupper(&ft)},%{toupper(&ff)},%{toupper(&fenc!=''?&fenc:&enc)}%{&bomb?',BOM':''}%{&eol?'':',NOEOL'}]
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Colors and Fonts
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Enable syntax highlighting
+syntax enable
+
+" Set the font and size
+set guifont=YaHei_Consolas_Hybrid:h14
+
+" Set color scheme
+if g:isGUI
+    colorscheme Tomorrow-Night               
+else
+    colorscheme Tomorrow-Night-Eighties     
+endif
+
 if (g:iswindows && g:isGUI)
     source $VIMRUNTIME/vimrc_example.vim
     source $VIMRUNTIME/mswin.vim
@@ -128,13 +183,7 @@ if (g:iswindows && g:isGUI)
     endfunction
 endif
 
-" -----------------------------------------------------------------------------
-"  < Linux Gvim/Vim 默认配置> 做了一点修改
-" -----------------------------------------------------------------------------
 if !g:iswindows
-    set hlsearch        "高亮搜索
-    set incsearch       "在输入要搜索的文字时，实时匹配
-
     " Uncomment the following to have Vim jump to the last position when
     " reopening a file
     if has("autocmd")
@@ -168,10 +217,38 @@ if !g:iswindows
     endif
 endif
 
+" -----------------------------------------------------------------------------
+" => encoding 
+" -----------------------------------------------------------------------------
+" Set gvim encoding
+set encoding=utf-8                                   
 
-" =============================================================================
-"                          << 以下为用户自定义配置 >>
-" =============================================================================
+" Set current file encoding
+set fileencoding=utf-8    
+
+" Set support to file encoding
+set fileencodings=ucs-bom,utf-8,gbk,cp936,latin-1     
+
+" 文件格式，默认 ffs=dos,unix
+set fileformat=unix                                   "设置新文件的<EOL>格式
+set fileformats=unix,dos,mac                          "给出文件的<EOL>格式类型
+
+if (g:iswindows && g:isGUI)
+    "解决菜单乱码
+    source $VIMRUNTIME/delmenu.vim
+    source $VIMRUNTIME/menu.vim
+
+    "解决consle输出乱码
+    language messages zh_CN.utf-8
+endif
+
+" -----------------------------------------------------------------------------
+" => Files, backup and undo
+" -----------------------------------------------------------------------------
+set nobackup
+set nowb
+set noswapfile
+set writebackup
 
 " -----------------------------------------------------------------------------
 "  < Vundle 插件管理工具配置 >
@@ -180,8 +257,6 @@ endif
 " 安装方法为在终端输入如下命令
 " git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
 
-set nocompatible                                      "禁用 Vi 兼容模式
-filetype off                                          "禁用文件类型侦测
 
 if !g:iswindows
     set rtp+=~/.vim/bundle/vundle/
@@ -191,10 +266,10 @@ else
     call vundle#rc('$VIM/vimfiles/bundle/')
 endif
 
-" 使用Vundle来管理Vundle，这个必须要有。
+" use Vundle to manager Vundel, This include must exist
 Bundle 'gmarik/vundle'
 
-" 以下为要安装或更新的插件，不同仓库都有（具体书写规范请参考帮助）
+" User plugin
 Bundle 'a.vim'
 Bundle 'Align'
 Bundle 'jiangmiao/auto-pairs'
@@ -223,26 +298,6 @@ Bundle 'TxtBrowser'
 " Bundle 'winmanager'
 Bundle 'ZoomWin'
 
-" -----------------------------------------------------------------------------
-"  < 编码配置 >
-" -----------------------------------------------------------------------------
-" 注：使用utf-8格式后，软件与程序源码、文件路径不能有中文，否则报错
-set encoding=utf-8                                    "设置gvim内部编码
-set fileencoding=utf-8                                "设置当前文件编码
-set fileencodings=ucs-bom,utf-8,gbk,cp936,latin-1     "设置支持打开的文件的编码
-
-" 文件格式，默认 ffs=dos,unix
-set fileformat=unix                                   "设置新文件的<EOL>格式
-set fileformats=unix,dos,mac                          "给出文件的<EOL>格式类型
-
-if (g:iswindows && g:isGUI)
-    "解决菜单乱码
-    source $VIMRUNTIME/delmenu.vim
-    source $VIMRUNTIME/menu.vim
-
-    "解决consle输出乱码
-    language messages zh_CN.utf-8
-endif
 
 " -----------------------------------------------------------------------------
 "  < 编写文件时的配置 >
@@ -256,7 +311,7 @@ set tabstop=4                                         "设置Tab键的宽度
 set shiftwidth=4                                      "换行时自动缩进4个空格
 set smarttab                                          "指定按一次backspace就删除shiftwidth宽度的空格
 "set foldenable                                        "启用折叠
-set foldmethod=indent                                 "indent 折叠方式
+"set foldmethod=indent                                 "indent 折叠方式
 " set foldmethod=marker                                "marker 折叠方式
 
 " 用空格键来开关折叠
@@ -290,49 +345,8 @@ imap <c-l> <Right>
 " 每行超过80个的字符用下划线标示
 au BufWinEnter * let w:m2=matchadd('Underlined', '\%>' . 80 . 'v.\+', -1)
 
-" -----------------------------------------------------------------------------
-"  < 界面配置 >
-" -----------------------------------------------------------------------------
-set number                                            "显示行号
-set laststatus=2                                      "启用状态栏信息
-set cmdheight=2                                       "设置命令行的高度为2，默认为1
-set cursorline                                        "突出显示当前行
-set guifont=YaHei_Consolas_Hybrid:h14                 "设置字体:字号（字体名称空格用下划线代替）
-set nowrap                                            "设置不自动换行
-set shortmess=atI                                     "去掉欢迎界面
-" au GUIEnter * simalt ~x                              "窗口启动时自动最大化
-winpos 100 10                                         "指定窗口出现的位置，坐标原点在屏幕左上角
-set lines=38 columns=120                              "指定窗口大小，lines为高度，columns为宽度
 
-" 设置代码配色方案
-if g:isGUI
-    colorscheme Tomorrow-Night-Eighties               "Gvim配色方案
-else
-    colorscheme Tomorrow-Night-Eighties               "终端配色方案
-endif
 
-" 个性化状栏（这里提供两种方式，要使用其中一种去掉注释即可，不使用反之）
-" let &statusline=' %t %{&mod?(&ro?"*":"+"):(&ro?"=":" ")} %1*|%* %{&ft==""?"any":&ft} %1*|%* %{&ff} %1*|%* %{(&fenc=="")?&enc:&fenc}%{(&bomb?",BOM":"")} %1*|%* %=%1*|%* 0x%B %1*|%* (%l,%c%V) %1*|%* %L %1*|%* %P'
-" set statusline=%t\ %1*%m%*\ %1*%r%*\ %2*%h%*%w%=%l%3*/%L(%p%%)%*,%c%V]\ [%b:0x%B]\ [%{&ft==''?'TEXT':toupper(&ft)},%{toupper(&ff)},%{toupper(&fenc!=''?&fenc:&enc)}%{&bomb?',BOM':''}%{&eol?'':',NOEOL'}]
-
-" 显示/隐藏菜单栏、工具栏、滚动条，可用 Ctrl + F11 切换
-if g:isGUI
-    set guioptions-=m
-    set guioptions-=T
-    set guioptions-=r
-    set guioptions-=L
-    map <silent> <c-F11> :if &guioptions =~# 'm' <Bar>
-        \set guioptions-=m <Bar>
-        \set guioptions-=T <Bar>
-        \set guioptions-=r <Bar>
-        \set guioptions-=L <Bar>
-    \else <Bar>
-        \set guioptions+=m <Bar>
-        \set guioptions+=T <Bar>
-        \set guioptions+=r <Bar>
-        \set guioptions+=L <Bar>
-    \endif<CR>
-endif
 
 " -----------------------------------------------------------------------------
 "  < 编译、连接、运行配置 >
@@ -508,14 +522,6 @@ func! Run()
         echohl WarningMsg | echo " running finish"
     endif
 endfunc
-
-" -----------------------------------------------------------------------------
-"  < 其它配置 >
-" -----------------------------------------------------------------------------
-set writebackup                             "保存文件前建立备份，保存成功后删除该备份
-set nobackup                                "设置无备份文件
-" set noswapfile                              "设置无临时文件
-set vb t_vb=                                "关闭提示音
 
 
 " =============================================================================
@@ -843,12 +849,3 @@ endif
 " =============================================================================
 
 " 自动切换目录为当前编辑文件所在目录
-au BufRead,BufNewFile,BufEnter * cd %:p:h
-
-" =============================================================================
-"                          << 其它 >>
-" =============================================================================
-
-" 注：上面配置中的"<Leader>"在本软件中设置为"\"键（引号里的反斜杠），如<Leader>t
-" 指在常规模式下按"\"键加"t"键，这里不是同时按，而是先按"\"键后按"t"键，间隔在一
-" 秒内，而<Leader>cs是先按"\"键再按"c"又再按"s"键
