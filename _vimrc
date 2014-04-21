@@ -1,4 +1,4 @@
-" -----------------------------------------------------------------------------
+﻿" -----------------------------------------------------------------------------
 "  < Judge current OS is Windows or Linux >
 " -----------------------------------------------------------------------------
 if(has("win32") || has("win64") || has("win95") || has("win16"))
@@ -19,15 +19,13 @@ endif
 "============================================
 " => General
 "============================================
+" Use Vim settings, rather than Vi settings (much better!).
+" This must be first, because it changes other options as a side effect.
+" Disable vi nocompatible
+set nocompatible    
+
 " Sets how many lines of history Vim has to remember
 set history=1000
-
-" Enable filetype plugins
-filetype plugin on
-filetype indent on
-
-" Disable vi nocompatible
-set nocompatible        
 
 " Set to auto read when a file is changed from the outside
 set autoread
@@ -49,11 +47,19 @@ else
 	autocmd! bufwritepost *.vimrc source $HOME/.vimrc
 endif
 
+" In many terminal emulators the mouse works just fine, thus enable it.
+if has('mouse')
+  set mouse=a
+endif
+
 " =========================================================================
 " => Vim user interface
 " =========================================================================
 " Set 7 lines to the cursor - when moving vertically using j/k
 set so=7
+
+" Enable filetype check
+filetype plugin indent on                           
 
 " Turn on the WiLd menu
 set wildmenu
@@ -104,6 +110,7 @@ if g:isGUI
     set guioptions-=T
     set guioptions-=r
     set guioptions-=L
+	set guioptions+=b  
     map <silent> <c-F11> :if &guioptions =~# 'm' <Bar>
         \set guioptions-=m <Bar>
         \set guioptions-=T <Bar>
@@ -115,21 +122,29 @@ if g:isGUI
         \set guioptions+=r <Bar>
         \set guioptions+=L <Bar>
     \endif<CR>
+	
+	" Set no warp if line too long
+	set nowrap
+
+	" Set scrool
+	set guioptions+=b  
 endif
 
 " Show line number
-set number                                            
+set number                                           
 
 " Set status line
 set laststatus=2
 
 " Show current line
 set cursorline    
+                                  
+" Hide startup message
+set shortmess=atI                                     
 
-set nowrap                                            "设置不自动换行
-set shortmess=atI                                     "去掉欢迎界面
+" Set maxium in startup
 " au GUIEnter * simalt ~x                              "窗口启动时自动最大化
-winpos 500 10                                         "指定窗口出现的位置，坐标原点在屏幕左上角
+winpos 300 30                                         "指定窗口出现的位置，坐标原点在屏幕左上角
 set lines=38 columns=120                              "指定窗口大小，lines为高度，columns为宽度
 
 " status line scheme
@@ -143,44 +158,18 @@ let &statusline=' %t %{&mod?(&ro?"*":"+"):(&ro?"=":" ")} %1*|%* %{&ft==""?"any":
 syntax enable
 
 " Set the font and size
-set guifont=YaHei_Consolas_Hybrid:h14
+set guifont=YaHei_Consolas_Hybrid:h12
 
 " Set color scheme
 if g:isGUI
-    colorscheme Tomorrow-Night               
+    colorscheme Tomorrow-Night-Eighties               
 else
     colorscheme Tomorrow-Night-Eighties     
 endif
 
 if (g:iswindows && g:isGUI)
-    source $VIMRUNTIME/vimrc_example.vim
     source $VIMRUNTIME/mswin.vim
     behave mswin
-    set diffexpr=MyDiff()
-
-    function MyDiff()
-        let opt = '-a --binary '
-        if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
-        if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
-        let arg1 = v:fname_in
-        if arg1 =~ ' ' | let arg1 = '"' . arg1 . '"' | endif
-        let arg2 = v:fname_new
-        if arg2 =~ ' ' | let arg2 = '"' . arg2 . '"' | endif
-        let arg3 = v:fname_out
-        if arg3 =~ ' ' | let arg3 = '"' . arg3 . '"' | endif
-        let eq = ''
-        if $VIMRUNTIME =~ ' '
-            if &sh =~ '\<cmd'
-                let cmd = '""' . $VIMRUNTIME . '\diff"'
-                let eq = '"'
-            else
-                let cmd = substitute($VIMRUNTIME, ' ', '" ', '') . '\diff"'
-            endif
-        else
-            let cmd = $VIMRUNTIME . '\diff'
-        endif
-        silent execute '!' . cmd . ' ' . opt . arg1 . ' ' . arg2 . ' > ' . arg3 . eq
-    endfunction
 endif
 
 if !g:iswindows
@@ -217,9 +206,9 @@ if !g:iswindows
     endif
 endif
 
-" -----------------------------------------------------------------------------
+"======================================================================
 " => encoding 
-" -----------------------------------------------------------------------------
+"======================================================================
 " Set gvim encoding
 set encoding=utf-8                                   
 
@@ -245,10 +234,65 @@ endif
 " -----------------------------------------------------------------------------
 " => Files, backup and undo
 " -----------------------------------------------------------------------------
+" no backup file
 set nobackup
+
+" set no write backup file
 set nowb
+
+" set no swap file
 set noswapfile
-set writebackup
+
+" -----------------------------------------------------------------------------
+" Editing setting
+" -----------------------------------------------------------------------------
+" Enable auto indent
+set autoindent
+
+" Enable smart indent
+set smartindent  
+
+" Enable C format imdent
+set cindent
+      
+" Change tab to space	  
+set expandtab                                         "将Tab键转换为空格
+set tabstop=4                                         "设置Tab键的宽度
+set shiftwidth=4                                      "换行时自动缩进4个空格
+set smarttab                                          "指定按一次backspace就删除shiftwidth宽度的空格
+"set foldenable                                        "启用折叠
+"set foldmethod=indent                                 "indent 折叠方式
+" set foldmethod=marker                                "marker 折叠方式
+
+" 用空格键来开关折叠
+nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR>
+
+" Clear spaces at the end in normal mode
+nmap cS :%s/\s\+$//g<cr>:noh<cr>
+
+" Clear ^M at the end in normal mode
+nmap cM :%s/\r$//g<cr>:noh<cr>
+
+" ignore case for search mode
+set ignorecase                                       
+
+" if searching upcase char, don't use ignorecase, useful just set ignorecase
+set smartcase                                         
+
+" Move up for insert mode
+imap <c-k> <Up>
+
+" Move down for insert mode
+imap <c-j> <Down>
+
+" Move left for insert mode
+imap <c-h> <Left>
+
+" Move right for insert mode
+imap <c-l> <Right>
+
+" Add underline to over 80 char each line
+au BufWinEnter * let w:m2=matchadd('Underlined', '\%>' . 80 . 'v.\+', -1)
 
 " -----------------------------------------------------------------------------
 "  < Vundle 插件管理工具配置 >
@@ -257,6 +301,8 @@ set writebackup
 " 安装方法为在终端输入如下命令
 " git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
 
+set nocompatible   
+filetype off
 
 if !g:iswindows
     set rtp+=~/.vim/bundle/vundle/
@@ -298,231 +344,7 @@ Bundle 'TxtBrowser'
 " Bundle 'winmanager'
 Bundle 'ZoomWin'
 
-
-" -----------------------------------------------------------------------------
-"  < 编写文件时的配置 >
-" -----------------------------------------------------------------------------
-filetype on                                           "启用文件类型侦测
-filetype plugin on                                    "针对不同的文件类型加载对应的插件
-filetype plugin indent on                             "启用缩进
-set smartindent                                       "启用智能对齐方式
-set expandtab                                         "将Tab键转换为空格
-set tabstop=4                                         "设置Tab键的宽度
-set shiftwidth=4                                      "换行时自动缩进4个空格
-set smarttab                                          "指定按一次backspace就删除shiftwidth宽度的空格
-"set foldenable                                        "启用折叠
-"set foldmethod=indent                                 "indent 折叠方式
-" set foldmethod=marker                                "marker 折叠方式
-
-" 用空格键来开关折叠
-nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR>
-
-" 当文件在外部被修改，自动更新该文件
-set autoread
-
-" 常规模式下输入 cS 清除行尾空格
-nmap cS :%s/\s\+$//g<cr>:noh<cr>
-
-" 常规模式下输入 cM 清除行尾 ^M 符号
-nmap cM :%s/\r$//g<cr>:noh<cr>
-
-set ignorecase                                        "搜索模式里忽略大小写
-set smartcase                                         "如果搜索模式包含大写字符，不使用 'ignorecase' 选项，只有在输入搜索模式并且打开 'ignorecase' 选项时才会使用
-" set noincsearch                                       "在输入要搜索的文字时，取消实时匹配
-
-" Ctrl + K 插入模式下光标向上移动
-imap <c-k> <Up>
-
-" Ctrl + J 插入模式下光标向下移动
-imap <c-j> <Down>
-
-" Ctrl + H 插入模式下光标向左移动
-imap <c-h> <Left>
-
-" Ctrl + L 插入模式下光标向右移动
-imap <c-l> <Right>
-
-" 每行超过80个的字符用下划线标示
-au BufWinEnter * let w:m2=matchadd('Underlined', '\%>' . 80 . 'v.\+', -1)
-
-
-
-
-" -----------------------------------------------------------------------------
-"  < 编译、连接、运行配置 >
-" -----------------------------------------------------------------------------
-" F9 一键保存、编译、连接存并运行
-map <F9> :call Run()<CR>
-imap <F9> <ESC>:call Run()<CR>
-
-" Ctrl + F9 一键保存并编译
-map <c-F9> :call Compile()<CR>
-imap <c-F9> <ESC>:call Compile()<CR>
-
-" Ctrl + F10 一键保存并连接
-map <c-F10> :call Link()<CR>
-imap <c-F10> <ESC>:call Link()<CR>
-
-let s:LastShellReturn_C = 0
-let s:LastShellReturn_L = 0
-let s:ShowWarning = 1
-let s:Obj_Extension = '.o'
-let s:Exe_Extension = '.exe'
-let s:Sou_Error = 0
-
-let s:windows_CFlags = 'gcc\ -fexec-charset=gbk\ -Wall\ -g\ -O0\ -c\ %\ -o\ %<.o'
-let s:linux_CFlags = 'gcc\ -Wall\ -g\ -O0\ -c\ %\ -o\ %<.o'
-
-let s:windows_CPPFlags = 'g++\ -fexec-charset=gbk\ -Wall\ -g\ -O0\ -c\ %\ -o\ %<.o'
-let s:linux_CPPFlags = 'g++\ -Wall\ -g\ -O0\ -c\ %\ -o\ %<.o'
-
-func! Compile()
-    exe ":ccl"
-    exe ":update"
-    if expand("%:e") == "c" || expand("%:e") == "cpp" || expand("%:e") == "cxx"
-        let s:Sou_Error = 0
-        let s:LastShellReturn_C = 0
-        let Sou = expand("%:p")
-        let Obj = expand("%:p:r").s:Obj_Extension
-        let Obj_Name = expand("%:p:t:r").s:Obj_Extension
-        let v:statusmsg = ''
-        if !filereadable(Obj) || (filereadable(Obj) && (getftime(Obj) < getftime(Sou)))
-            redraw!
-            if expand("%:e") == "c"
-                if g:iswindows
-                    exe ":setlocal makeprg=".s:windows_CFlags
-                else
-                    exe ":setlocal makeprg=".s:linux_CFlags
-                endif
-                echohl WarningMsg | echo " compiling..."
-                silent make
-            elseif expand("%:e") == "cpp" || expand("%:e") == "cxx"
-                if g:iswindows
-                    exe ":setlocal makeprg=".s:windows_CPPFlags
-                else
-                    exe ":setlocal makeprg=".s:linux_CPPFlags
-                endif
-                echohl WarningMsg | echo " compiling..."
-                silent make
-            endif
-            redraw!
-            if v:shell_error != 0
-                let s:LastShellReturn_C = v:shell_error
-            endif
-            if g:iswindows
-                if s:LastShellReturn_C != 0
-                    exe ":bo cope"
-                    echohl WarningMsg | echo " compilation failed"
-                else
-                    if s:ShowWarning
-                        exe ":bo cw"
-                    endif
-                    echohl WarningMsg | echo " compilation successful"
-                endif
-            else
-                if empty(v:statusmsg)
-                    echohl WarningMsg | echo " compilation successful"
-                else
-                    exe ":bo cope"
-                endif
-            endif
-        else
-            echohl WarningMsg | echo ""Obj_Name"is up to date"
-        endif
-    else
-        let s:Sou_Error = 1
-        echohl WarningMsg | echo " please choose the correct source file"
-    endif
-    exe ":setlocal makeprg=make"
-endfunc
-
-func! Link()
-    call Compile()
-    if s:Sou_Error || s:LastShellReturn_C != 0
-        return
-    endif
-    let s:LastShellReturn_L = 0
-    let Sou = expand("%:p")
-    let Obj = expand("%:p:r").s:Obj_Extension
-    if g:iswindows
-        let Exe = expand("%:p:r").s:Exe_Extension
-        let Exe_Name = expand("%:p:t:r").s:Exe_Extension
-    else
-        let Exe = expand("%:p:r")
-        let Exe_Name = expand("%:p:t:r")
-    endif
-    let v:statusmsg = ''
-	if filereadable(Obj) && (getftime(Obj) >= getftime(Sou))
-        redraw!
-        if !executable(Exe) || (executable(Exe) && getftime(Exe) < getftime(Obj))
-            if expand("%:e") == "c"
-                setlocal makeprg=gcc\ -o\ %<\ %<.o
-                echohl WarningMsg | echo " linking..."
-                silent make
-            elseif expand("%:e") == "cpp" || expand("%:e") == "cxx"
-                setlocal makeprg=g++\ -o\ %<\ %<.o
-                echohl WarningMsg | echo " linking..."
-                silent make
-            endif
-            redraw!
-            if v:shell_error != 0
-                let s:LastShellReturn_L = v:shell_error
-            endif
-            if g:iswindows
-                if s:LastShellReturn_L != 0
-                    exe ":bo cope"
-                    echohl WarningMsg | echo " linking failed"
-                else
-                    if s:ShowWarning
-                        exe ":bo cw"
-                    endif
-                    echohl WarningMsg | echo " linking successful"
-                endif
-            else
-                if empty(v:statusmsg)
-                    echohl WarningMsg | echo " linking successful"
-                else
-                    exe ":bo cope"
-                endif
-            endif
-        else
-            echohl WarningMsg | echo ""Exe_Name"is up to date"
-        endif
-    endif
-    setlocal makeprg=make
-endfunc
-
-func! Run()
-    let s:ShowWarning = 0
-    call Link()
-    let s:ShowWarning = 1
-    if s:Sou_Error || s:LastShellReturn_C != 0 || s:LastShellReturn_L != 0
-        return
-    endif
-    let Sou = expand("%:p")
-    let Obj = expand("%:p:r").s:Obj_Extension
-    if g:iswindows
-        let Exe = expand("%:p:r").s:Exe_Extension
-    else
-        let Exe = expand("%:p:r")
-    endif
-    if executable(Exe) && getftime(Exe) >= getftime(Obj) && getftime(Obj) >= getftime(Sou)
-        redraw!
-        echohl WarningMsg | echo " running..."
-        if g:iswindows
-            exe ":!%<.exe"
-        else
-            if g:isGUI
-                exe ":!gnome-terminal -e ./%<"
-            else
-                exe ":!./%<"
-            endif
-        endif
-        redraw!
-        echohl WarningMsg | echo " running finish"
-    endif
-endfunc
-
+filetype plugin indent on
 
 " =============================================================================
 "                          << 以下为常用插件配置 >>
@@ -577,13 +399,13 @@ au! BufRead,BufNewFile,BufEnter *.{c,cpp,h,javascript} call CSyntaxAfter()
 " 用于显示对齐线，与 indent_guides 在显示方式上不同，根据自己喜好选择了
 " 在终端上会有屏幕刷新的问题，这个问题能解决有更好了
 " 开启/关闭对齐线
-nmap <leader>il :IndentLinesToggle<CR>
+"nmap <leader>il :IndentLinesToggle<CR>
 
 " 设置Gvim的对齐线样式
-if g:isGUI
-    let g:indentLine_char = "┊"
-    let g:indentLine_first_char = "┊"
-endif
+"if g:isGUI
+    "let g:indentLine_char = "┊"
+    "let g:indentLine_first_char = "┊"
+"endif
 
 " 设置终端对齐线颜色
 " let g:indentLine_color_term = 239
@@ -849,3 +671,4 @@ endif
 " =============================================================================
 
 " 自动切换目录为当前编辑文件所在目录
+"au BufRead,BufNewFile,BufEnter * cd %:p:h
