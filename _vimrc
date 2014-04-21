@@ -21,14 +21,26 @@ endif
 "============================================
 " Use Vim settings, rather than Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
-" Disable vi nocompatible
-set nocompatible    
+" Disable vi no compatible
+set nocompatible
 
 " Sets how many lines of history Vim has to remember
 set history=1000
 
+" Enable spell on
+"set spell
+
 " Set to auto read when a file is changed from the outside
 set autoread
+
+" Hide startup message
+set shortmess+=atI
+
+" Better Unix/windows compatible (maybe)
+set viewoptions=folds,options,cursor,unix,slash
+
+" Allow for cursor beyond last character
+set virtualedit=onemore
 
 " With a map leader it's possible to do extra key combinations
 " like <leader>w saves the current file
@@ -58,10 +70,10 @@ endif
 " Set 7 lines to the cursor - when moving vertically using j/k
 set so=7
 
-" Enable filetype check
-filetype plugin indent on                           
+" Enable file type check
+filetype plugin indent on
 
-" Turn on the WiLd menu
+" Turn on the Wild menu
 set wildmenu
 
 " Always show current position
@@ -84,7 +96,7 @@ set hlsearch
 set incsearch
 
 " Don't redraw while executing macros   good setting!!!!!!!!!!!!
-set lazyredraw
+"set lazyredraw
 
 " For regular expressions turn magic on
 set magic
@@ -110,7 +122,7 @@ if g:isGUI
     set guioptions-=T
     set guioptions-=r
     set guioptions-=L
-	set guioptions+=b  
+	set guioptions+=b
     map <silent> <c-F11> :if &guioptions =~# 'm' <Bar>
         \set guioptions-=m <Bar>
         \set guioptions-=T <Bar>
@@ -122,30 +134,30 @@ if g:isGUI
         \set guioptions+=r <Bar>
         \set guioptions+=L <Bar>
     \endif<CR>
-	
+
 	" Set no warp if line too long
 	set nowrap
-
-	" Set scrool
-	set guioptions+=b  
 endif
 
 " Show line number
-set number                                           
+set number
 
 " Set status line
 set laststatus=2
 
 " Show current line
-set cursorline    
-                                  
-" Hide startup message
-set shortmess=atI                                     
+set cursorline
+
+
 
 " Set maxium in startup
-" au GUIEnter * simalt ~x                              "窗口启动时自动最大化
-winpos 300 30                                         "指定窗口出现的位置，坐标原点在屏幕左上角
-set lines=38 columns=120                              "指定窗口大小，lines为高度，columns为宽度
+" au GUIEnter * simalt ~x
+
+" Set startup pos
+winpos 300 30
+
+" Set startup window size
+set lines=38 columns=120
 
 " status line scheme
 let &statusline=' %t %{&mod?(&ro?"*":"+"):(&ro?"=":" ")} %1*|%* %{&ft==""?"any":&ft} %1*|%* %{&ff} %1*|%* %{(&fenc=="")?&enc:&fenc}%{(&bomb?",BOM":"")} %1*|%* %=%1*|%* 0x%B %1*|%* (%l,%c%V) %1*|%* %L %1*|%* %P'
@@ -162,9 +174,9 @@ set guifont=YaHei_Consolas_Hybrid:h12
 
 " Set color scheme
 if g:isGUI
-    colorscheme Tomorrow-Night-Eighties               
+    colorscheme Tomorrow-Night-Eighties
 else
-    colorscheme Tomorrow-Night-Eighties     
+    colorscheme Tomorrow-Night-Eighties
 endif
 
 if (g:iswindows && g:isGUI)
@@ -207,27 +219,27 @@ if !g:iswindows
 endif
 
 "======================================================================
-" => encoding 
+" => encoding
 "======================================================================
 " Set gvim encoding
-set encoding=utf-8                                   
+set encoding=utf-8
 
 " Set current file encoding
-set fileencoding=utf-8    
+set fileencoding=utf-8
 
 " Set support to file encoding
-set fileencodings=ucs-bom,utf-8,gbk,cp936,latin-1     
+set fileencodings=ucs-bom,utf-8,gbk,cp936,latin-1
 
-" 文件格式，默认 ffs=dos,unix
-set fileformat=unix                                   "设置新文件的<EOL>格式
-set fileformats=unix,dos,mac                          "给出文件的<EOL>格式类型
+" file format
+set fileformat=unix      
+set fileformats=unix,dos,mac
 
 if (g:iswindows && g:isGUI)
-    "解决菜单乱码
+    " fix menu messy code
     source $VIMRUNTIME/delmenu.vim
     source $VIMRUNTIME/menu.vim
 
-    "解决consle输出乱码
+    " fix messy code
     language messages zh_CN.utf-8
 endif
 
@@ -250,21 +262,31 @@ set noswapfile
 set autoindent
 
 " Enable smart indent
-set smartindent  
+set smartindent
 
 " Enable C format imdent
 set cindent
-      
-" Change tab to space	  
-set expandtab                                         "将Tab键转换为空格
-set tabstop=4                                         "设置Tab键的宽度
-set shiftwidth=4                                      "换行时自动缩进4个空格
-set smarttab                                          "指定按一次backspace就删除shiftwidth宽度的空格
-"set foldenable                                        "启用折叠
-"set foldmethod=indent                                 "indent 折叠方式
-" set foldmethod=marker                                "marker 折叠方式
 
-" 用空格键来开关折叠
+" Change tab to space
+set expandtab
+
+" Set tab to 4 char wide
+set tabstop=4          
+
+" Set auto indent for 4 spaces to warp
+set shiftwidth=4                     
+
+" Enable smart tab for use backspace delete
+set smarttab                              
+
+" Enable fold
+"set foldenable
+
+" fold mode
+"set foldmethod=indent
+" set foldmethod=marker
+
+" Use space to switch fold
 nnoremap <space> @=((foldclosed(line('.')) < 0) ? 'zc' : 'zo')<CR>
 
 " Clear spaces at the end in normal mode
@@ -274,10 +296,10 @@ nmap cS :%s/\s\+$//g<cr>:noh<cr>
 nmap cM :%s/\r$//g<cr>:noh<cr>
 
 " ignore case for search mode
-set ignorecase                                       
+set ignorecase
 
 " if searching upcase char, don't use ignorecase, useful just set ignorecase
-set smartcase                                         
+set smartcase
 
 " Move up for insert mode
 imap <c-k> <Up>
@@ -291,58 +313,64 @@ imap <c-h> <Left>
 " Move right for insert mode
 imap <c-l> <Right>
 
+" Disable highlight when <leader><cr> is pressed
+map <silent> <leader>, :nohlsearch<cr>
+
 " Add underline to over 80 char each line
 au BufWinEnter * let w:m2=matchadd('Underlined', '\%>' . 80 . 'v.\+', -1)
 
-" -----------------------------------------------------------------------------
+" =========================================================================
+" => Windows and buffers
+" =========================================================================
+" Smart way to move between windows
+map <C-j> <C-W>j
+map <C-k> <C-W>k
+map <C-h> <C-W>h
+map <C-l> <C-W>l
+
+" Close the current buffer
+map <leader>bd :Bclose<cr>
+
+" Close all the buffers
+map <leader>ba :1,1000 bd!<cr>
+
+" Useful mappings for managing tabs
+map <leader>tn :tabnew<cr>
+map <leader>to :tabonly<cr>
+map <leader>tc :tabclose<cr>
+map <leader>tm :tabmove 
+map <leader>t<leader> :tabnext 
+
+" Opens a new tab with the current buffer's path
+" Super useful when editing files in the same directory
+map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
+
+" Switch CWD to the directory of the open buffer
+map <leader>cd :cd %:p:h<cr>:pwd<cr>
+
+" Specify the behavior when switching between buffers 
+try
+  set switchbuf=useopen,usetab,newtab
+  set stal=2
+catch
+endtry
+
+" Return to last edit position when opening files (You want this!)
+autocmd BufReadPost *
+     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+     \   exe "normal! g`\"" |
+     \ endif
+" Remember info about open buffers on close
+set viminfo^=%
+
 "  < Vundle 插件管理工具配置 >
 " -----------------------------------------------------------------------------
 " 用于更方便的管理vim插件，具体用法参考 :h vundle 帮助
 " 安装方法为在终端输入如下命令
 " git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
 
-set nocompatible   
+set nocompatible
 filetype off
-
-if !g:iswindows
-    set rtp+=~/.vim/bundle/vundle/
-    call vundle#rc()
-else
-    set rtp+=$VIM/vimfiles/bundle/vundle/
-    call vundle#rc('$VIM/vimfiles/bundle/')
-endif
-
-" use Vundle to manager Vundel, This include must exist
-Bundle 'gmarik/vundle'
-
-" User plugin
-Bundle 'a.vim'
-Bundle 'Align'
-Bundle 'jiangmiao/auto-pairs'
-Bundle 'bufexplorer.zip'
-Bundle 'ccvext.vim'
-Bundle 'oblitum/cSyntaxAfter'
-Bundle 'Yggdroot/indentLine'
-Bundle 'breestealth/Mark-Karkat'
-" Bundle 'minibufexpl.vim'
-" Bundle 'fholgado/minibufexpl.vim' "这个上的6.4.4版本与 Vundle 插件有一些冲突
-Bundle 'Shougo/neocomplcache'
-Bundle 'scrooloose/nerdcommenter'
-Bundle 'scrooloose/nerdtree'
-Bundle 'FromtonRouge/OmniCppComplete'
-Bundle 'Lokaltog/vim-powerline'
-Bundle 'repeat.vim'
-Bundle 'msanders/snipmate.vim'
-Bundle 'wesleyche/SrcExpl'
-" Bundle 'ervandew/supertab'
-Bundle 'std_c.zip'
-Bundle 'tpope/vim-surround'
-Bundle 'scrooloose/syntastic'
-Bundle 'majutsushi/tagbar'
-Bundle 'netroby/taglist'
-Bundle 'TxtBrowser'
-" Bundle 'winmanager'
-Bundle 'ZoomWin'
 
 filetype plugin indent on
 
