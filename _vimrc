@@ -174,7 +174,16 @@ set guifont=YaHei_Consolas_Hybrid:h12
 
 " Set color scheme
 if g:isGUI
-    colorscheme Tomorrow-Night-Eighties
+    set background=dark
+	if filereadable(expand("$VIM/vimfiles/bundle/vim-colors-solarized/colors/solarized.vim"))
+        let g:solarized_termcolors=256
+        let g:solarized_termtrans=1
+        let g:solarized_contrast="normal"
+        let g:solarized_visibility="normal"
+        color solarized             " Load a colorscheme
+	else
+	colorscheme Tomorrow-Night-Eighties
+    endif
 else
     colorscheme Tomorrow-Night-Eighties
 endif
